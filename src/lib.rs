@@ -524,7 +524,9 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(Box::new(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2))))
+            IndexBackend::Hnsw(Box::new(HnswIndex::new(
+                kept.len().max(20_000).max(self.dim * 2),
+            )))
         };
         for ep in kept {
             let id = ep.id;
@@ -555,7 +557,9 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(Box::new(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2))))
+            IndexBackend::Hnsw(Box::new(HnswIndex::new(
+                kept.len().max(20_000).max(self.dim * 2),
+            )))
         };
         for ep in kept {
             let id = ep.id;
@@ -593,7 +597,9 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(Box::new(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2))))
+            IndexBackend::Hnsw(Box::new(HnswIndex::new(
+                kept.len().max(20_000).max(self.dim * 2),
+            )))
         };
         for ep in kept {
             let id = ep.id;
