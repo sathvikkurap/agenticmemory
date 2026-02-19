@@ -1,0 +1,22 @@
+{
+  "name": "agent_mem_db",
+  "version": "0.1.0",
+  "description": "Node.js bindings for agent_mem_db — episodic memory with HNSW vector search",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "binaryName": "agent_mem_db"
+  },
+  "scripts": {
+    "build": "napi build --release",
+    "build:debug": "napi build",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3"
+  },
+  "engines": {
+    "node": ">= 14"
+  },
+  "license": "MIT"
+}

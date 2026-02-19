@@ -1,0 +1,61 @@
+# Agent Memory DB — Helm values
+# Usage: helm install agent-mem ./deploy/helm/agent-mem-server -f values.yaml
+
+replicaCount: 1
+
+image:
+  repository: agent-mem-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# API key (required in production). Create a Secret and reference it:
+# apiKey:
+#   secretName: agent-mem-api-key
+#   secretKey: api-key
+apiKey:
+  secretName: ""
+  secretKey: api-key
+
+# Environment overrides
+env:
+  # AGENT_MEM_DIM: 384
+  # AGENT_MEM_DATA_DIR: /data
+  # AGENT_MEM_RATE_LIMIT: "100"
+  # AGENT_MEM_RATE_WINDOW_SECS: "60"
+  # AGENT_MEM_AUDIT_LOG: /var/log/agent-mem/audit.jsonl
+
+# Persistence for disk-backed storage (optional)
+# When enabled, AGENT_MEM_DATA_DIR is set to mountPath so each tenant uses AgentMemDBDisk.
+# For multi-replica: use accessMode: ReadWriteMany with NFS-backed storageClass.
+persistence:
+  enabled: false
+  storageClass: ""
+  size: 1Gi
+  # ReadWriteOnce (default) or ReadWriteMany for shared multi-replica
+  accessMode: ReadWriteOnce
+  # Mount path for tenant data (episodes.jsonl, meta.json, exact_checkpoint.json)
+  mountPath: /var/agent-mem
+
+# Ingress (optional)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: agent-mem.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

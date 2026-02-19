@@ -1,0 +1,15 @@
+Agent Memory DB server has been deployed.
+
+1. Get the application URL:
+{{- if .Values.ingress.enabled }}
+  {{- range $host := .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ (index $host.paths 0).path }}
+  {{- end }}
+{{- else }}
+  kubectl port-forward svc/{{ include "agent-mem-server.fullname" . }} 8080:8080
+  Then: http://localhost:8080
+{{- end }}
+
+2. Health check: GET /health
+3. Metrics: GET /metrics (Prometheus)
+4. API: POST /v1/episodes, POST /v1/query, etc. (see docs/design_hosted_memory.md)

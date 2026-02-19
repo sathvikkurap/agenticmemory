@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent_mem_db_langgraph"
+version = "0.1.0"
+description = "LangGraph BaseStore backend using AgentMemDB for episodic memory"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+dependencies = [
+    "agent_mem_db_py>=0.1.0",
+    "langgraph>=0.2",
+    "langchain-core>=0.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agent_mem_db_langgraph*"]

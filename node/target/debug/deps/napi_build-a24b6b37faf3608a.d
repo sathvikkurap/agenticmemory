@@ -1,0 +1,10 @@
+/Users/sathvikkurapati/Downloads/agenticmemory/agent_mem_db/node/target/debug/deps/napi_build-a24b6b37faf3608a.d: /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/lib.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/android.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/wasi.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/windows.rs
+
+/Users/sathvikkurapati/Downloads/agenticmemory/agent_mem_db/node/target/debug/deps/libnapi_build-a24b6b37faf3608a.rlib: /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/lib.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/android.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/wasi.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/windows.rs
+
+/Users/sathvikkurapati/Downloads/agenticmemory/agent_mem_db/node/target/debug/deps/libnapi_build-a24b6b37faf3608a.rmeta: /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/lib.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/android.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/wasi.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/windows.rs
+
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/lib.rs:
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/android.rs:
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/wasi.rs:
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/napi-build-2.3.1/src/windows.rs:

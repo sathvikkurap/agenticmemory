@@ -1,0 +1,4 @@
+{
+  "variants": ["no_memory", "agent_mem_db"],
+  "num_tasks": 10
+}

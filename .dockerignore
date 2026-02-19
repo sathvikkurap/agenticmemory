@@ -1,0 +1,16 @@
+# Exclude from Docker build context (keep workspace crates so Cargo can resolve)
+target/
+.git/
+*.md
+node/node_modules/
+python/.venv/
+python/**/__pycache__/
+integrations/
+benches/
+tests/
+examples/
+go/
+deploy/
+docs/
+*.json
+!Cargo.lock

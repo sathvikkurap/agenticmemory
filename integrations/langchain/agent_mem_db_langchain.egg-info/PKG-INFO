@@ -1,0 +1,50 @@
+Metadata-Version: 2.4
+Name: agent_mem_db_langchain
+Version: 0.1.0
+Summary: LangChain VectorStore backend using AgentMemDB
+License-Expression: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: agent_mem_db_py>=0.1.0
+Requires-Dist: langchain-core>=0.2
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+
+# agent_mem_db_langchain
+
+LangChain VectorStore backend using AgentMemDB for episodic memory with HNSW retrieval.
+
+## Install
+
+```bash
+pip install agent_mem_db_py langchain-core
+# From repo: pip install -e integrations/langchain
+```
+
+## Usage
+
+```python
+from langchain_core.embeddings import FakeEmbeddings  # or OpenAIEmbeddings, etc.
+from agent_mem_db_langchain import AgentMemDBVectorStore
+
+embedding = FakeEmbeddings(size=16)
+store = AgentMemDBVectorStore(embedding=embedding, dim=16)
+store.add_texts(["Alice likes cats", "Bob prefers dogs"])
+docs = store.similarity_search("pets", k=2)
+```
+
+### With RAG
+
+```python
+from langchain_core.embeddings import FakeEmbeddings
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from agent_mem_db_langchain import AgentMemDBVectorStore
+
+embedding = FakeEmbeddings(size=16)
+store = AgentMemDBVectorStore(embedding=embedding, dim=16)
+store.add_texts(["Key fact: the project deadline is March 15"])
+
+retriever = store.as_retriever(k=2)
+# Use with LCEL: retriever | format_docs | llm
+```

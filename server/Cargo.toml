@@ -1,0 +1,20 @@
+[package]
+name = "agent_mem_db_server"
+version = "0.1.0"
+edition = "2021"
+description = "HTTP server for Agent Memory DB — Hosted Memory Cloud Phase 1"
+
+[[bin]]
+name = "agent-mem-server"
+path = "src/main.rs"
+
+[dependencies]
+agent_mem_db = { path = ".." }
+axum = { version = "0.7", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+chrono = "0.4"

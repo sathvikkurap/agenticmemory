@@ -1,0 +1,32 @@
+# Rust
+/target/
+/Cargo.lock
+
+# Python virtualenvs
+/.venv/
+/python/.venv/
+**/.venv/
+
+# Maturin and wheels
+*.whl
+*.so
+*.dylib
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# Node
+node/node_modules/
+
+# Misc
+*.log
+eval_results.json

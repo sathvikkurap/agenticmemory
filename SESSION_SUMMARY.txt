@@ -1,0 +1,44 @@
+Session Summary — Agent Memory DB Platform (2026-02)
+====================================================
+
+Overview
+--------
+Agent Memory DB has evolved from a library into a full agent memory platform.
+All main roadmap items are complete. Remaining work is marked "future" in design_roadmap.md.
+
+Current State
+-------------
+- Core: HNSW + exact backends, AgentMemDBDisk, ExactIndex checkpoint (fast restart), rich metadata (timestamp, tags, source, user_id), query filters, async API, retention pruning (prune_older_than, prune_keep_newest, prune_keep_highest_reward)
+- Bindings: Python, Node.js, Go (cgo + C-ABI)
+- Integrations: LangChain VectorStore, LangGraph AgentMemDBStore
+- Server: Hosted Memory Cloud Phases 1–3 — HTTP API, multi-tenant, auth, rate limit, audit, dashboard
+- Disk persistence: AGENT_MEM_DATA_DIR → AgentMemDBDisk per tenant; POST /v1/checkpoint
+- Deployment: Docker, Helm (persistence, multi-replica + NFS), Terraform
+- Eval: Config-driven eval, analysis scripts, memory benchmarks doc
+
+Key Paths
+--------
+- Rust core: src/lib.rs, src/index.rs, src/disk.rs
+- Server: server/src/main.rs — make server-run
+- Python: python/ — maturin develop
+- Node: node/ — npm run build && npm test
+- Go: go/ — make go-build (requires cargo build -p agent_mem_db_capi --release first)
+- Deploy: deploy/helm/, deploy/terraform/
+
+Makefile Targets
+----------------
+make test, make bench, make fmt, make clippy
+make server, make server-run
+make docker-build, make docker-run
+make disk-checkpoint
+make go-build, make go-test, make go-example
+make helm-install, make terraform-init, make terraform-apply
+make eval, make eval-analyze
+make langchain-example, make langgraph-agent
+make coding-assistant, make personal-assistant
+
+Future Roadmap Items (design docs in place)
+-------------------------------------------
+- PQ/IVF index backends — docs/design_pq_ivf.md
+- HNSW checkpoint — docs/design_hnsw_checkpoint.md
+- Horizontal scaling — Option A (multi-replica + NFS) done; Options B–D in design_horizontal_scaling.md

@@ -1,0 +1,13 @@
+apiVersion: v2
+name: agent-mem-server
+description: Agent Memory DB — Hosted Memory Cloud HTTP server
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - agent
+  - memory
+  - embeddings
+maintainers:
+  - name: Agent Memory DB
+    url: https://github.com/agent-mem-db/agent_mem_db

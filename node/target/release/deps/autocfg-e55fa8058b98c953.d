@@ -1,0 +1,10 @@
+/Users/sathvikkurapati/Downloads/agenticmemory/agent_mem_db/node/target/release/deps/autocfg-e55fa8058b98c953.d: /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/lib.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/error.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/rustc.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/version.rs
+
+/Users/sathvikkurapati/Downloads/agenticmemory/agent_mem_db/node/target/release/deps/libautocfg-e55fa8058b98c953.rlib: /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/lib.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/error.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/rustc.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/version.rs
+
+/Users/sathvikkurapati/Downloads/agenticmemory/agent_mem_db/node/target/release/deps/libautocfg-e55fa8058b98c953.rmeta: /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/lib.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/error.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/rustc.rs /Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/version.rs
+
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/lib.rs:
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/error.rs:
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/rustc.rs:
+/Users/sathvikkurapati/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.0/src/version.rs:
