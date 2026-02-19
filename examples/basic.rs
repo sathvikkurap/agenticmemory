@@ -9,11 +9,7 @@ fn main() {
     for _ in 0..1000 {
         let embedding: Vec<f32> = (0..dim).map(|_| rng.gen()).collect();
         let reward: f32 = rng.gen_range(-1.0..=1.0);
-        let episode = Episode::new(
-            format!("task_{}", rng.gen_range(0..10)),
-            embedding,
-            reward,
-        );
+        let episode = Episode::new(format!("task_{}", rng.gen_range(0..10)), embedding, reward);
         db.store_episode(episode).unwrap();
     }
     // Query with a random embedding and min_reward = 0.5

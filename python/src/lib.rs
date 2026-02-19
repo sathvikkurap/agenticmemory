@@ -101,10 +101,7 @@ fn rust_episode_to_py(py: Python, ep: &agent_mem_db::Episode) -> PyResult<Episod
     })
 }
 
-fn results_to_py(
-    py: Python,
-    results: Vec<agent_mem_db::Episode>,
-) -> PyResult<Vec<Episode>> {
+fn results_to_py(py: Python, results: Vec<agent_mem_db::Episode>) -> PyResult<Vec<Episode>> {
     let mut out = Vec::with_capacity(results.len());
     for ep in results {
         out.push(rust_episode_to_py(py, &ep)?);

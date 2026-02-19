@@ -74,7 +74,10 @@ fn test_query_filters_tags_and_time() {
     let opts = QueryOptions::new(0.0, 5).tags_any(vec!["coding".into()]);
     let results = db.query_similar_with_options(&query, opts).unwrap();
     assert_eq!(results.len(), 1);
-    assert_eq!(results[0].tags.as_deref(), Some(&["coding".to_string()][..]));
+    assert_eq!(
+        results[0].tags.as_deref(),
+        Some(&["coding".to_string()][..])
+    );
 
     let opts = QueryOptions::new(0.0, 5).time_after(1500).time_before(2500);
     let results = db.query_similar_with_options(&query, opts).unwrap();
@@ -82,13 +85,26 @@ fn test_query_filters_tags_and_time() {
     assert_eq!(results[0].timestamp, Some(2000));
 
     // tags_all: episode must have all tags
-    let ep5 = Episode::with_tags("t5", vec![0.1; dim], 0.85, vec!["coding".into(), "python".into()]);
+    let ep5 = Episode::with_tags(
+        "t5",
+        vec![0.1; dim],
+        0.85,
+        vec!["coding".into(), "python".into()],
+    );
     db.store_episode(ep5).unwrap();
     let opts = QueryOptions::new(0.0, 5).tags_all(vec!["coding".into(), "python".into()]);
     let results = db.query_similar_with_options(&query, opts).unwrap();
     assert_eq!(results.len(), 1);
-    assert!(results[0].tags.as_ref().unwrap().contains(&"coding".to_string()));
-    assert!(results[0].tags.as_ref().unwrap().contains(&"python".to_string()));
+    assert!(results[0]
+        .tags
+        .as_ref()
+        .unwrap()
+        .contains(&"coding".to_string()));
+    assert!(results[0]
+        .tags
+        .as_ref()
+        .unwrap()
+        .contains(&"python".to_string()));
 
     // task_id_prefix
     let opts = QueryOptions::new(0.0, 5).task_id_prefix("t".to_string());
@@ -110,7 +126,9 @@ fn test_recency_tie_breaker() {
     let ep_new = Episode::with_timestamp("new", emb.clone(), 0.9, 2000);
     db.store_episode(ep_old).unwrap();
     db.store_episode(ep_new).unwrap();
-    let results = db.query_similar_with_options(&emb, QueryOptions::new(0.0, 2)).unwrap();
+    let results = db
+        .query_similar_with_options(&emb, QueryOptions::new(0.0, 2))
+        .unwrap();
     assert_eq!(results.len(), 2);
     assert_eq!(results[0].task_id, "new");
     assert_eq!(results[1].task_id, "old");

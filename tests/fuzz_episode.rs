@@ -14,9 +14,12 @@ fn metadata_strategy() -> impl Strategy<Value = Value> {
     prop_oneof![
         Just(Value::Null),
         any::<bool>().prop_map(Value::Bool),
-        (-1e10f64..=1e10f64).prop_map(|f| Value::Number(serde_json::Number::from_f64(f).unwrap_or(serde_json::Number::from(0)))),
+        (-1e10f64..=1e10f64).prop_map(|f| Value::Number(
+            serde_json::Number::from_f64(f).unwrap_or(serde_json::Number::from(0))
+        )),
         any::<String>().prop_map(Value::String),
-        prop::collection::vec(any::<String>(), 0..5).prop_map(|v| Value::Array(v.into_iter().map(Value::String).collect())),
+        prop::collection::vec(any::<String>(), 0..5)
+            .prop_map(|v| Value::Array(v.into_iter().map(Value::String).collect())),
     ]
 }
 
@@ -50,7 +53,17 @@ fn episode_strategy(dim: usize) -> impl Strategy<Value = Episode> {
         prop::option::of(any::<String>()),
     )
         .prop_map(
-            |(state_embedding, reward, task_id, metadata, steps, timestamp, tags, source, user_id)| Episode {
+            |(
+                state_embedding,
+                reward,
+                task_id,
+                metadata,
+                steps,
+                timestamp,
+                tags,
+                source,
+                user_id,
+            )| Episode {
                 id: Uuid::new_v4(),
                 task_id,
                 state_embedding,

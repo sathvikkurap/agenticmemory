@@ -126,13 +126,19 @@ pub fn bench_disk_open_replay_vs_checkpoint(c: &mut Criterion) {
     let _ = std::fs::remove_dir_all(&dir_checkpoint);
 
     {
-        let mut db = AgentMemDBDisk::open_with_options(&dir_replay, DiskOptions::exact_with_checkpoint(dim)).unwrap();
+        let mut db =
+            AgentMemDBDisk::open_with_options(&dir_replay, DiskOptions::exact_with_checkpoint(dim))
+                .unwrap();
         for ep in &episodes {
             db.store_episode(ep.clone()).unwrap();
         }
     }
     {
-        let mut db = AgentMemDBDisk::open_with_options(&dir_checkpoint, DiskOptions::exact_with_checkpoint(dim)).unwrap();
+        let mut db = AgentMemDBDisk::open_with_options(
+            &dir_checkpoint,
+            DiskOptions::exact_with_checkpoint(dim),
+        )
+        .unwrap();
         for ep in &episodes {
             db.store_episode(ep.clone()).unwrap();
         }
@@ -142,12 +148,18 @@ pub fn bench_disk_open_replay_vs_checkpoint(c: &mut Criterion) {
     let mut g = c.benchmark_group("disk_open");
     g.bench_function("open_replay_5k_eps", |b| {
         b.iter(|| {
-            let _ = AgentMemDBDisk::open_with_options(&dir_replay, DiskOptions::exact_with_checkpoint(dim));
+            let _ = AgentMemDBDisk::open_with_options(
+                &dir_replay,
+                DiskOptions::exact_with_checkpoint(dim),
+            );
         })
     });
     g.bench_function("open_from_checkpoint_5k_eps", |b| {
         b.iter(|| {
-            let _ = AgentMemDBDisk::open_with_options(&dir_checkpoint, DiskOptions::exact_with_checkpoint(dim));
+            let _ = AgentMemDBDisk::open_with_options(
+                &dir_checkpoint,
+                DiskOptions::exact_with_checkpoint(dim),
+            );
         })
     });
     g.finish();

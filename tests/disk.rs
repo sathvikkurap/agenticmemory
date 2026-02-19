@@ -135,15 +135,16 @@ fn test_disk_checkpoint_fast_restart() {
     let dim = 8;
 
     {
-        let mut db = AgentMemDBDisk::open_with_options(&dir, DiskOptions::exact_with_checkpoint(dim))
-            .unwrap();
+        let mut db =
+            AgentMemDBDisk::open_with_options(&dir, DiskOptions::exact_with_checkpoint(dim))
+                .unwrap();
         db.store_episode(make_episode(dim, 0.7)).unwrap();
         db.store_episode(make_episode(dim, 0.8)).unwrap();
         db.checkpoint().unwrap();
     }
 
-    let db2 = AgentMemDBDisk::open_with_options(&dir, DiskOptions::exact_with_checkpoint(dim))
-        .unwrap();
+    let db2 =
+        AgentMemDBDisk::open_with_options(&dir, DiskOptions::exact_with_checkpoint(dim)).unwrap();
     let results = db2.query_similar(&vec![0.1; dim], 0.5, 5).unwrap();
     assert_eq!(results.len(), 2);
     assert!(results.iter().all(|e| e.reward >= 0.5));

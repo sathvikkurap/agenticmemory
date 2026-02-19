@@ -13,7 +13,10 @@ use uuid::Uuid;
 fn test_input_strategy() -> impl Strategy<Value = (usize, Vec<(Vec<f32>, f32)>, Vec<f32>, usize)> {
     (2usize..=16, 1usize..=25).prop_flat_map(|(dim, num_episodes)| {
         let ep_strat = prop::collection::vec(
-            (prop::collection::vec(-1.0f32..=1.0f32, dim), -1.0f32..=1.0f32),
+            (
+                prop::collection::vec(-1.0f32..=1.0f32, dim),
+                -1.0f32..=1.0f32,
+            ),
             num_episodes,
         );
         let query_strat = prop::collection::vec(-1.0f32..=1.0f32, dim);

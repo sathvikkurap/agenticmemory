@@ -25,26 +25,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install maturin
-        run: pip install maturin pytest
+      - name: Create venv and install maturin
+        working-directory: python
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -U pip maturin pytest
       - name: Build and test
         working-directory: python
         run: |
-          maturin develop --release
-          pytest tests/ -v
+          .venv/bin/maturin develop --release
+          .venv/bin/pytest tests/ -v
       - name: Run agent eval
         working-directory: python
-        run: python -m examples.agents.run_eval
+        run: .venv/bin/python -m examples.agents.run_eval
       - name: LangChain integration tests
         working-directory: python
         run: |
-          pip install -e ../integrations/langchain langchain-core
-          pytest ../integrations/langchain/tests/ -v
+          .venv/bin/pip install -e ../integrations/langchain langchain-core
+          .venv/bin/pytest ../integrations/langchain/tests/ -v
       - name: LangGraph integration tests
         working-directory: python
         run: |
-          pip install -e ../integrations/langgraph
-          pytest ../integrations/langgraph/tests/ -v
+          .venv/bin/pip install -e ../integrations/langgraph
+          .venv/bin/pytest ../integrations/langgraph/tests/ -v
 
   node:
     runs-on: ubuntu-latest
@@ -72,5 +75,6 @@ jobs:
       - name: Build C API
         run: cargo build -p agent_mem_db_capi --release
       - name: Go tests
-        working-directory: go
-        run: go test -v ./...
+        run: |
+          export LD_LIBRARY_PATH="$PWD/target/release${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          cd go && go test -v ./...

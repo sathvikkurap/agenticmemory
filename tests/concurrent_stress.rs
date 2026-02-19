@@ -5,8 +5,8 @@
 //! no data corruption, queries return valid results.
 
 use agent_mem_db::{AgentMemDB, Episode};
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 use std::thread;
 use uuid::Uuid;
 
@@ -48,7 +48,10 @@ fn test_concurrent_store_and_query() {
         let write_count = Arc::clone(&write_count);
         writers.push(thread::spawn(move || {
             for i in 0..OPS_PER_WRITER {
-                let ep = make_episode((w * OPS_PER_WRITER + i) as u64, 0.5 + (i % 10) as f32 * 0.05);
+                let ep = make_episode(
+                    (w * OPS_PER_WRITER + i) as u64,
+                    0.5 + (i % 10) as f32 * 0.05,
+                );
                 let mut guard = db.write().unwrap();
                 guard.store_episode(ep).unwrap();
                 write_count.fetch_add(1, Ordering::SeqCst);
@@ -61,7 +64,9 @@ fn test_concurrent_store_and_query() {
         let db = Arc::clone(&db);
         let read_count = Arc::clone(&read_count);
         readers.push(thread::spawn(move || {
-            let query: Vec<f32> = (0..DIM).map(|i| (r as f32 * 0.02 + i as f32 * 0.01) as f32 % 1.0 - 0.5).collect();
+            let query: Vec<f32> = (0..DIM)
+                .map(|i| (r as f32 * 0.02 + i as f32 * 0.01) as f32 % 1.0 - 0.5)
+                .collect();
             for _ in 0..OPS_PER_READER {
                 let guard = db.read().unwrap();
                 let results = guard.query_similar(&query, 0.0, 5).unwrap();
@@ -79,8 +84,14 @@ fn test_concurrent_store_and_query() {
         h.join().unwrap();
     }
 
-    assert_eq!(write_count.load(Ordering::SeqCst), (WRITERS * OPS_PER_WRITER) as u64);
-    assert_eq!(read_count.load(Ordering::SeqCst), (READERS * OPS_PER_READER) as u64);
+    assert_eq!(
+        write_count.load(Ordering::SeqCst),
+        (WRITERS * OPS_PER_WRITER) as u64
+    );
+    assert_eq!(
+        read_count.load(Ordering::SeqCst),
+        (READERS * OPS_PER_READER) as u64
+    );
 
     let guard = db.read().unwrap();
     let total = guard
@@ -150,8 +161,9 @@ fn test_concurrent_hnsw_no_panic() {
         .map(|r| {
             let db = Arc::clone(&db);
             thread::spawn(move || {
-                let query: Vec<f32> =
-                    (0..DIM).map(|i| (r as f32 * 0.1 + i as f32) * 0.01 % 1.0 - 0.5).collect();
+                let query: Vec<f32> = (0..DIM)
+                    .map(|i| (r as f32 * 0.1 + i as f32) * 0.01 % 1.0 - 0.5)
+                    .collect();
                 for _ in 0..n_reads {
                     let guard = db.read().unwrap();
                     let _ = guard.query_similar(&query, 0.0, 10).unwrap();

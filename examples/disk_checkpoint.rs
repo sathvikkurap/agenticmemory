@@ -15,7 +15,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // First run: create DB, store episodes, checkpoint
     {
-        let mut db = AgentMemDBDisk::open_with_options(&dir, DiskOptions::exact_with_checkpoint(dim))?;
+        let mut db =
+            AgentMemDBDisk::open_with_options(&dir, DiskOptions::exact_with_checkpoint(dim))?;
         db.store_episode(Episode::new("task_1", vec![0.1; dim], 0.8))?;
         db.store_episode(Episode::new("task_2", vec![0.2; dim], 0.9))?;
         db.checkpoint()?;

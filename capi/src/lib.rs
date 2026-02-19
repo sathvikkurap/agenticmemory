@@ -193,7 +193,9 @@ pub extern "C" fn agent_mem_db_prune_older_than(
         return 0;
     }
     let db = unsafe { &*h };
-    db.lock().unwrap().prune_older_than(timestamp_cutoff_ms as i64) as size_t
+    db.lock()
+        .unwrap()
+        .prune_older_than(timestamp_cutoff_ms as i64) as size_t
 }
 
 /// Prune to keep only n most recent episodes. Returns number removed.
@@ -208,7 +210,10 @@ pub extern "C" fn agent_mem_db_prune_keep_newest(h: *mut Mutex<AgentMemDB>, n: s
 
 /// Prune to keep only n highest-reward episodes. Returns number removed.
 #[no_mangle]
-pub extern "C" fn agent_mem_db_prune_keep_highest_reward(h: *mut Mutex<AgentMemDB>, n: size_t) -> size_t {
+pub extern "C" fn agent_mem_db_prune_keep_highest_reward(
+    h: *mut Mutex<AgentMemDB>,
+    n: size_t,
+) -> size_t {
     if h.is_null() {
         return 0;
     }
@@ -220,7 +225,10 @@ pub extern "C" fn agent_mem_db_prune_keep_highest_reward(h: *mut Mutex<AgentMemD
 
 /// Open disk-backed DB. Returns null on error.
 #[no_mangle]
-pub extern "C" fn agent_mem_db_disk_open(path: *const c_char, dim: size_t) -> *mut Mutex<AgentMemDBDisk> {
+pub extern "C" fn agent_mem_db_disk_open(
+    path: *const c_char,
+    dim: size_t,
+) -> *mut Mutex<AgentMemDBDisk> {
     if path.is_null() || dim == 0 {
         set_last_error("null path or dim must be > 0");
         return ptr::null_mut();
@@ -372,7 +380,11 @@ pub extern "C" fn agent_mem_db_disk_prune_older_than(
         return -1;
     }
     let db = unsafe { &*h };
-    match db.lock().unwrap().prune_older_than(timestamp_cutoff_ms as i64) {
+    match db
+        .lock()
+        .unwrap()
+        .prune_older_than(timestamp_cutoff_ms as i64)
+    {
         Ok(n) => n as c_int,
         Err(e) => {
             set_last_error(&e.to_string());

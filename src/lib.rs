@@ -391,10 +391,7 @@ impl AgentMemDB {
         min_reward: f32,
         top_k: usize,
     ) -> Result<Vec<Episode>, AgentMemError> {
-        self.query_similar_with_options(
-            query_embedding,
-            QueryOptions::new(min_reward, top_k),
-        )
+        self.query_similar_with_options(query_embedding, QueryOptions::new(min_reward, top_k))
     }
 
     /// Query with full filter options (tags, time range).
@@ -421,7 +418,9 @@ impl AgentMemDB {
         } else {
             2
         };
-        let results = self.index.search(query_embedding, opts.top_k * candidate_mult);
+        let results = self
+            .index
+            .search(query_embedding, opts.top_k * candidate_mult);
         let mut candidates: Vec<(f32, Episode)> = results
             .into_iter()
             .filter_map(|(key, dist)| {
@@ -511,7 +510,11 @@ impl AgentMemDB {
         let kept: Vec<Episode> = self
             .episodes
             .values()
-            .filter(|ep| ep.timestamp.map(|t| t >= timestamp_cutoff_ms).unwrap_or(true))
+            .filter(|ep| {
+                ep.timestamp
+                    .map(|t| t >= timestamp_cutoff_ms)
+                    .unwrap_or(true)
+            })
             .cloned()
             .collect();
         let removed = self.episodes.len() - kept.len();
@@ -521,9 +524,7 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(
-                kept.len().max(20_000).max(self.dim * 2),
-            ))
+            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
         };
         for ep in kept {
             let id = ep.id;
@@ -554,9 +555,7 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(
-                kept.len().max(20_000).max(self.dim * 2),
-            ))
+            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
         };
         for ep in kept {
             let id = ep.id;
@@ -576,7 +575,10 @@ impl AgentMemDB {
         let mut episodes: Vec<Episode> = self.episodes.drain().map(|(_, ep)| ep).collect();
         let original = episodes.len();
         episodes.sort_by(|a, b| {
-            let reward_cmp = b.reward.partial_cmp(&a.reward).unwrap_or(std::cmp::Ordering::Equal);
+            let reward_cmp = b
+                .reward
+                .partial_cmp(&a.reward)
+                .unwrap_or(std::cmp::Ordering::Equal);
             if reward_cmp != std::cmp::Ordering::Equal {
                 return reward_cmp;
             }
@@ -591,9 +593,7 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(
-                kept.len().max(20_000).max(self.dim * 2),
-            ))
+            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
         };
         for ep in kept {
             let id = ep.id;

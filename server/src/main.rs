@@ -142,7 +142,14 @@ struct AuditEntry {
     path: Option<String>,
 }
 
-fn audit_log(state: &AppState, tenant_id: &str, op: &str, task_id: Option<&str>, episode_count: Option<usize>, path: Option<&str>) {
+fn audit_log(
+    state: &AppState,
+    tenant_id: &str,
+    op: &str,
+    task_id: Option<&str>,
+    episode_count: Option<usize>,
+    path: Option<&str>,
+) {
     if let Some(ref audit) = state.audit_log {
         let entry = AuditEntry {
             ts: chrono::Utc::now().to_rfc3339(),
@@ -501,7 +508,10 @@ async fn metrics(State(state): State<AppState>) -> impl IntoResponse {
     let queries = state.metrics.query_total.load(Ordering::Relaxed);
     let tenants = state.tenants.read().await.len();
     (
-        [(axum::http::header::CONTENT_TYPE, "text/plain; charset=utf-8")],
+        [(
+            axum::http::header::CONTENT_TYPE,
+            "text/plain; charset=utf-8",
+        )],
         format!(
             "# HELP agent_mem_requests_total Total authenticated API requests\n\
              # TYPE agent_mem_requests_total counter\n\
@@ -537,8 +547,14 @@ async fn store_episode(
     let db = match tenants.entry(tenant_id.clone()) {
         std::collections::hash_map::Entry::Occupied(o) => o.into_mut(),
         std::collections::hash_map::Entry::Vacant(v) => {
-            let backend = create_tenant_backend(state.data_dir.as_ref(), &tenant_id, state.default_dim)
-                .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({"error": e.to_string()}))))?;
+            let backend =
+                create_tenant_backend(state.data_dir.as_ref(), &tenant_id, state.default_dim)
+                    .map_err(|e| {
+                        (
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            Json(serde_json::json!({"error": e.to_string()})),
+                        )
+                    })?;
             v.insert(backend)
         }
     };
@@ -550,8 +566,18 @@ async fn store_episode(
         )
     })?;
 
-    state.metrics.store_episodes_total.fetch_add(1, Ordering::Relaxed);
-    audit_log(&state, &tenant_id, "store_episode", Some(&req.task_id), Some(1), None);
+    state
+        .metrics
+        .store_episodes_total
+        .fetch_add(1, Ordering::Relaxed);
+    audit_log(
+        &state,
+        &tenant_id,
+        "store_episode",
+        Some(&req.task_id),
+        Some(1),
+        None,
+    );
     Ok(Json(StoreEpisodeResponse { id }))
 }
 
@@ -579,8 +605,14 @@ async fn store_episodes(
     let db = match tenants.entry(tenant_id.clone()) {
         std::collections::hash_map::Entry::Occupied(o) => o.into_mut(),
         std::collections::hash_map::Entry::Vacant(v) => {
-            let backend = create_tenant_backend(state.data_dir.as_ref(), &tenant_id, state.default_dim)
-                .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({"error": e.to_string()}))))?;
+            let backend =
+                create_tenant_backend(state.data_dir.as_ref(), &tenant_id, state.default_dim)
+                    .map_err(|e| {
+                        (
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            Json(serde_json::json!({"error": e.to_string()})),
+                        )
+                    })?;
             v.insert(backend)
         }
     };
@@ -592,8 +624,18 @@ async fn store_episodes(
         )
     })?;
 
-    state.metrics.store_episodes_total.fetch_add(ids.len() as u64, Ordering::Relaxed);
-    audit_log(&state, &tenant_id, "store_episodes", None, Some(ids.len()), None);
+    state
+        .metrics
+        .store_episodes_total
+        .fetch_add(ids.len() as u64, Ordering::Relaxed);
+    audit_log(
+        &state,
+        &tenant_id,
+        "store_episodes",
+        None,
+        Some(ids.len()),
+        None,
+    );
     Ok(Json(StoreEpisodesResponse { ids }))
 }
 
@@ -606,7 +648,9 @@ async fn query_similar(
     let db = if let Some(backend) = tenants.get_mut(&tenant_id) {
         backend
     } else if let Some(ref data_dir) = state.data_dir {
-        let meta_path = data_dir.join(sanitize_tenant_path(&tenant_id)).join("meta.json");
+        let meta_path = data_dir
+            .join(sanitize_tenant_path(&tenant_id))
+            .join("meta.json");
         if !meta_path.exists() {
             return Err((
                 StatusCode::NOT_FOUND,
@@ -614,7 +658,12 @@ async fn query_similar(
             ));
         }
         let backend = create_tenant_backend(Some(data_dir), &tenant_id, state.default_dim)
-            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({"error": e.to_string()}))))?;
+            .map_err(|e| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({"error": e.to_string()})),
+                )
+            })?;
         tenants.insert(tenant_id.clone(), backend);
         tenants.get_mut(&tenant_id).unwrap()
     } else {
@@ -689,7 +738,14 @@ async fn save(
         )
     })?;
 
-    audit_log(&state, &tenant_id, "save", None, None, Some(req.path.as_str()));
+    audit_log(
+        &state,
+        &tenant_id,
+        "save",
+        None,
+        None,
+        Some(req.path.as_str()),
+    );
     Ok(Json(SaveResponse { ok: true }))
 }
 
@@ -701,20 +757,31 @@ async fn load(
     if state.data_dir.is_some() {
         return Err((
             StatusCode::BAD_REQUEST,
-            Json(serde_json::json!({"error": "Load not supported when using disk-backed storage (AGENT_MEM_DATA_DIR)"})),
+            Json(
+                serde_json::json!({"error": "Load not supported when using disk-backed storage (AGENT_MEM_DATA_DIR)"}),
+            ),
         ));
     }
 
     let path = PathBuf::from(&req.path);
-    let db = AgentMemDB::load_from_file(&path).map_err(|e| (
-        StatusCode::BAD_REQUEST,
-        Json(serde_json::json!({"error": format!("Load failed: {}", e)})),
-    ))?;
+    let db = AgentMemDB::load_from_file(&path).map_err(|e| {
+        (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({"error": format!("Load failed: {}", e)})),
+        )
+    })?;
 
     let mut tenants = state.tenants.write().await;
     tenants.insert(tenant_id.clone(), TenantBackend::InMemory(db));
 
-    audit_log(&state, &tenant_id, "load", None, None, Some(req.path.as_str()));
+    audit_log(
+        &state,
+        &tenant_id,
+        "load",
+        None,
+        None,
+        Some(req.path.as_str()),
+    );
     Ok(Json(LoadResponse { ok: true }))
 }
 
@@ -729,11 +796,20 @@ async fn prune_older_than(
         Json(serde_json::json!({"error": "No episodes stored for this tenant yet"})),
     ))?;
 
-    let removed = db.prune_older_than(req.timestamp_cutoff_ms).map_err(|e| (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        Json(serde_json::json!({"error": e.to_string()})),
-    ))?;
-    audit_log(&state, &tenant_id, "prune_older_than", None, Some(removed), None);
+    let removed = db.prune_older_than(req.timestamp_cutoff_ms).map_err(|e| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({"error": e.to_string()})),
+        )
+    })?;
+    audit_log(
+        &state,
+        &tenant_id,
+        "prune_older_than",
+        None,
+        Some(removed),
+        None,
+    );
     Ok(Json(PruneResponse { removed }))
 }
 
@@ -748,11 +824,20 @@ async fn prune_keep_newest(
         Json(serde_json::json!({"error": "No episodes stored for this tenant yet"})),
     ))?;
 
-    let removed = db.prune_keep_newest(req.n).map_err(|e| (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        Json(serde_json::json!({"error": e.to_string()})),
-    ))?;
-    audit_log(&state, &tenant_id, "prune_keep_newest", None, Some(removed), None);
+    let removed = db.prune_keep_newest(req.n).map_err(|e| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({"error": e.to_string()})),
+        )
+    })?;
+    audit_log(
+        &state,
+        &tenant_id,
+        "prune_keep_newest",
+        None,
+        Some(removed),
+        None,
+    );
     Ok(Json(PruneResponse { removed }))
 }
 
@@ -767,11 +852,20 @@ async fn prune_keep_highest_reward(
         Json(serde_json::json!({"error": "No episodes stored for this tenant yet"})),
     ))?;
 
-    let removed = db.prune_keep_highest_reward(req.n).map_err(|e| (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        Json(serde_json::json!({"error": e.to_string()})),
-    ))?;
-    audit_log(&state, &tenant_id, "prune_keep_highest_reward", None, Some(removed), None);
+    let removed = db.prune_keep_highest_reward(req.n).map_err(|e| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({"error": e.to_string()})),
+        )
+    })?;
+    audit_log(
+        &state,
+        &tenant_id,
+        "prune_keep_highest_reward",
+        None,
+        Some(removed),
+        None,
+    );
     Ok(Json(PruneResponse { removed }))
 }
 
@@ -790,10 +884,12 @@ async fn checkpoint(
         Json(serde_json::json!({"error": "No episodes stored for this tenant yet"})),
     ))?;
 
-    db.checkpoint().map_err(|e| (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        Json(serde_json::json!({"error": e.to_string()})),
-    ))?;
+    db.checkpoint().map_err(|e| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({"error": e.to_string()})),
+        )
+    })?;
 
     audit_log(&state, &tenant_id, "checkpoint", None, None, None);
     Ok(Json(CheckpointResponse { ok: true }))
@@ -830,16 +926,14 @@ async fn main() {
             )
         });
 
-    let audit_log = std::env::var("AGENT_MEM_AUDIT_LOG")
-        .ok()
-        .and_then(|path| {
-            std::fs::OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(&path)
-                .ok()
-                .map(|f| Arc::new(std::sync::RwLock::new(Some(f))))
-        });
+    let audit_log = std::env::var("AGENT_MEM_AUDIT_LOG").ok().and_then(|path| {
+        std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&path)
+            .ok()
+            .map(|f| Arc::new(std::sync::RwLock::new(Some(f))))
+    });
 
     let state = AppState {
         tenants: Arc::new(RwLock::new(HashMap::new())),
@@ -871,7 +965,10 @@ async fn main() {
         .route("/load", post(load))
         .route("/prune/older-than", post(prune_older_than))
         .route("/prune/keep-newest", post(prune_keep_newest))
-        .route("/prune/keep-highest-reward", post(prune_keep_highest_reward))
+        .route(
+            "/prune/keep-highest-reward",
+            post(prune_keep_highest_reward),
+        )
         .route("/checkpoint", post(checkpoint))
         .route_layer(axum::middleware::from_fn_with_state(
             state.clone(),

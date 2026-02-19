@@ -53,11 +53,8 @@ impl From<RustEpisode> for Episode {
 
 impl From<Episode> for RustEpisode {
     fn from(ep: Episode) -> Self {
-        let mut rust = RustEpisode::new(
-            ep.task_id,
-            f64_to_f32(ep.state_embedding),
-            ep.reward as f32,
-        );
+        let mut rust =
+            RustEpisode::new(ep.task_id, f64_to_f32(ep.state_embedding), ep.reward as f32);
         rust.metadata = ep.metadata.unwrap_or(serde_json::Value::Null);
         rust.timestamp = ep.timestamp;
         rust.tags = ep.tags;

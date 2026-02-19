@@ -50,7 +50,10 @@ impl AgentMemDBDisk {
     }
 
     /// Open with explicit options (index type, max_elements).
-    pub fn open_with_options(path: impl AsRef<Path>, opts: DiskOptions) -> Result<Self, AgentMemError> {
+    pub fn open_with_options(
+        path: impl AsRef<Path>,
+        opts: DiskOptions,
+    ) -> Result<Self, AgentMemError> {
         let path = path.as_ref().to_path_buf();
         fs::create_dir_all(&path)
             .map_err(|e| AgentMemError::HnswError(format!("Create dir: {e}")))?;
@@ -80,9 +83,8 @@ impl AgentMemDBDisk {
 
             let (episodes, key_to_uuid, index) = if log_path.exists() {
                 let checkpoint_path = path.join(EXACT_CHECKPOINT_FILE);
-                let try_checkpoint = opts.use_checkpoint
-                    && meta.index_type == "exact"
-                    && checkpoint_path.exists();
+                let try_checkpoint =
+                    opts.use_checkpoint && meta.index_type == "exact" && checkpoint_path.exists();
 
                 if try_checkpoint {
                     let line_count = Self::count_log_lines(&log_path)?;
@@ -95,11 +97,7 @@ impl AgentMemDBDisk {
                     Self::replay_log(&log_path, meta.dim, meta.max_elements, &meta.index_type)?
                 }
             } else {
-                (
-                    HashMap::new(),
-                    HashMap::new(),
-                    index,
-                )
+                (HashMap::new(), HashMap::new(), index)
             };
 
             (meta.dim, index, episodes, key_to_uuid)
@@ -112,9 +110,7 @@ impl AgentMemDBDisk {
 
             let meta = DiskMeta {
                 dim: opts.dim,
-                index_type: opts
-                    .index_type
-                    .unwrap_or_else(|| "hnsw".to_string()),
+                index_type: opts.index_type.unwrap_or_else(|| "hnsw".to_string()),
                 max_elements: opts.max_elements,
                 checkpoint_line_count: None,
             };
@@ -158,14 +154,7 @@ impl AgentMemDBDisk {
     fn load_from_checkpoint(
         checkpoint_path: &Path,
         dim: usize,
-    ) -> Result<
-        (
-            HashMap<Uuid, Episode>,
-            HashMap<usize, Uuid>,
-            IndexBackend,
-        ),
-        AgentMemError,
-    > {
+    ) -> Result<(HashMap<Uuid, Episode>, HashMap<usize, Uuid>, IndexBackend), AgentMemError> {
         let data = fs::read_to_string(checkpoint_path)
             .map_err(|e| AgentMemError::HnswError(format!("Read checkpoint: {e}")))?;
         let cp: ExactCheckpoint = serde_json::from_str(&data)
@@ -202,14 +191,7 @@ impl AgentMemDBDisk {
         dim: usize,
         max_elements: usize,
         index_type: &str,
-    ) -> Result<
-        (
-            HashMap<Uuid, Episode>,
-            HashMap<usize, Uuid>,
-            IndexBackend,
-        ),
-        AgentMemError,
-    > {
+    ) -> Result<(HashMap<Uuid, Episode>, HashMap<usize, Uuid>, IndexBackend), AgentMemError> {
         let file = File::open(log_path)
             .map_err(|e| AgentMemError::HnswError(format!("Open log for replay: {e}")))?;
         let reader = BufReader::new(file);
@@ -256,7 +238,11 @@ impl AgentMemDBDisk {
 
         let line_count = Self::count_log_lines(&self.path.join(EPISODES_LOG))?;
         let episodes: Vec<Episode> = (0..self.index.len())
-            .filter_map(|key| self.key_to_uuid.get(&key).and_then(|id| self.episodes.get(id)))
+            .filter_map(|key| {
+                self.key_to_uuid
+                    .get(&key)
+                    .and_then(|id| self.episodes.get(id))
+            })
             .cloned()
             .collect();
 
@@ -335,15 +321,15 @@ impl AgentMemDBDisk {
                 got: query_embedding.len(),
             });
         }
-        let candidate_mult = if opts.tags_any.is_some()
-            || opts.time_after.is_some()
-            || opts.time_before.is_some()
-        {
-            4
-        } else {
-            2
-        };
-        let results = self.index.search(query_embedding, opts.top_k * candidate_mult);
+        let candidate_mult =
+            if opts.tags_any.is_some() || opts.time_after.is_some() || opts.time_before.is_some() {
+                4
+            } else {
+                2
+            };
+        let results = self
+            .index
+            .search(query_embedding, opts.top_k * candidate_mult);
         let episodes: Vec<Episode> = results
             .into_iter()
             .filter_map(|(key, _)| {
@@ -364,7 +350,11 @@ impl AgentMemDBDisk {
         let kept: Vec<Episode> = self
             .episodes
             .values()
-            .filter(|ep| ep.timestamp.map(|t| t >= timestamp_cutoff_ms).unwrap_or(true))
+            .filter(|ep| {
+                ep.timestamp
+                    .map(|t| t >= timestamp_cutoff_ms)
+                    .unwrap_or(true)
+            })
             .cloned()
             .collect();
         let removed = self.episodes.len() - kept.len();
@@ -378,9 +368,7 @@ impl AgentMemDBDisk {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(
-                kept.len().max(20_000).max(self.dim * 2),
-            ))
+            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
         };
 
         for ep in &kept {
@@ -438,9 +426,7 @@ impl AgentMemDBDisk {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(
-                kept.len().max(20_000).max(self.dim * 2),
-            ))
+            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
         };
 
         for ep in &kept {
@@ -485,7 +471,10 @@ impl AgentMemDBDisk {
         let mut episodes: Vec<Episode> = self.episodes.drain().map(|(_, ep)| ep).collect();
         let original = episodes.len();
         episodes.sort_by(|a, b| {
-            let reward_cmp = b.reward.partial_cmp(&a.reward).unwrap_or(std::cmp::Ordering::Equal);
+            let reward_cmp = b
+                .reward
+                .partial_cmp(&a.reward)
+                .unwrap_or(std::cmp::Ordering::Equal);
             if reward_cmp != std::cmp::Ordering::Equal {
                 return reward_cmp;
             }
@@ -501,9 +490,7 @@ impl AgentMemDBDisk {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(
-                kept.len().max(20_000).max(self.dim * 2),
-            ))
+            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
         };
 
         for ep in &kept {
