@@ -1,4 +1,4 @@
-.PHONY: test test-all bench fmt clippy python-dev python-test eval eval-analyze build-node node-test langchain-example langgraph-example langgraph-agent langgraph-test server server-run docker-build docker-run helm-install helm-uninstall terraform-init terraform-apply go-build go-test go-example coding-assistant personal-assistant disk-checkpoint
+.PHONY: test test-all bench fmt clippy python-dev python-test eval eval-analyze build-node node-test langchain-example langgraph-example langgraph-agent langgraph-test langchain-test server server-run docker-build docker-run helm-install helm-uninstall terraform-init terraform-apply go-build go-test go-example coding-assistant personal-assistant disk-checkpoint
 
 test:
 	cargo test
@@ -53,6 +53,9 @@ personal-assistant:
 
 langgraph-test:
 	cd python && .venv/bin/pip install -q -e ../integrations/langgraph pytest && .venv/bin/pytest ../integrations/langgraph/tests/ -v
+
+langchain-test:
+	cd python && .venv/bin/pip install -q -e ../integrations/langchain pytest && .venv/bin/pytest ../integrations/langchain/tests/ -v
 
 server:
 	cargo build -p agent_mem_db_server --release

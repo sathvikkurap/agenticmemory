@@ -35,3 +35,42 @@ jobs:
       - name: Run agent eval
         working-directory: python
         run: python -m examples.agents.run_eval
+      - name: LangChain integration tests
+        working-directory: python
+        run: |
+          pip install -e ../integrations/langchain langchain-core
+          pytest ../integrations/langchain/tests/ -v
+      - name: LangGraph integration tests
+        working-directory: python
+        run: |
+          pip install -e ../integrations/langgraph
+          pytest ../integrations/langgraph/tests/ -v
+
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build and test
+        working-directory: node
+        run: |
+          npm ci || npm install
+          npm run build
+          npm test
+
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: Build C API
+        run: cargo build -p agent_mem_db_capi --release
+      - name: Go tests
+        working-directory: go
+        run: go test -v ./...
