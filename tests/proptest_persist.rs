@@ -7,10 +7,11 @@ use agent_mem_db::{AgentMemDB, Episode};
 use proptest::prelude::*;
 use serde_json::Value;
 use std::collections::HashSet;
-use std::path::PathBuf;
 use uuid::Uuid;
 
-fn test_input_strategy() -> impl Strategy<Value = (usize, Vec<(Vec<f32>, f32)>, Vec<f32>, usize)> {
+type ProptestInput = (usize, Vec<(Vec<f32>, f32)>, Vec<f32>, usize);
+
+fn test_input_strategy() -> impl Strategy<Value = ProptestInput> {
     (2usize..=16, 1usize..=25).prop_flat_map(|(dim, num_episodes)| {
         let ep_strat = prop::collection::vec(
             (
@@ -53,7 +54,7 @@ proptest! {
         let orig_results = db.query_similar(&query, -1.0, top_k).unwrap();
         let orig_ids: HashSet<_> = orig_results.iter().map(|ep| ep.id).collect();
 
-        let path = PathBuf::from(std::env::temp_dir()).join("agent_mem_db_proptest.json");
+        let path = std::env::temp_dir().join("agent_mem_db_proptest.json");
         db.save_to_file(&path).unwrap();
         let db2 = AgentMemDB::load_from_file_exact(&path).unwrap();
         let _ = std::fs::remove_file(&path);

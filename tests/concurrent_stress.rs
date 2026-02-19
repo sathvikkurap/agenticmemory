@@ -18,8 +18,8 @@ const OPS_PER_READER: usize = 500;
 
 fn make_episode(seed: u64, reward: f32) -> Episode {
     let mut emb = vec![0.0f32; DIM];
-    for i in 0..DIM {
-        emb[i] = ((seed as f32 * 0.1 + i as f32 * 0.01) % 1.0) - 0.5;
+    for (i, v) in emb.iter_mut().enumerate() {
+        *v = ((seed as f32 * 0.1 + i as f32 * 0.01) % 1.0) - 0.5;
     }
     Episode {
         id: Uuid::new_v4(),
@@ -65,7 +65,7 @@ fn test_concurrent_store_and_query() {
         let read_count = Arc::clone(&read_count);
         readers.push(thread::spawn(move || {
             let query: Vec<f32> = (0..DIM)
-                .map(|i| (r as f32 * 0.02 + i as f32 * 0.01) as f32 % 1.0 - 0.5)
+                .map(|i| (r as f32 * 0.02 + i as f32 * 0.01) % 1.0 - 0.5)
                 .collect();
             for _ in 0..OPS_PER_READER {
                 let guard = db.read().unwrap();
@@ -95,7 +95,7 @@ fn test_concurrent_store_and_query() {
 
     let guard = db.read().unwrap();
     let total = guard
-        .query_similar(&vec![0.0; DIM], -1.0, WRITERS * OPS_PER_WRITER + 1)
+        .query_similar(&[0.0; DIM], -1.0, WRITERS * OPS_PER_WRITER + 1)
         .unwrap();
     assert_eq!(
         total.len(),
@@ -132,7 +132,7 @@ fn test_concurrent_mixed_ops() {
     }
 
     let guard = db.read().unwrap();
-    let results = guard.query_similar(&vec![0.0; DIM], 0.0, 1000).unwrap();
+    let results = guard.query_similar(&[0.0; DIM], 0.0, 1000).unwrap();
     assert_eq!(results.len(), 4 * n_ops, "4 writer threads * n_ops each");
 }
 
@@ -177,7 +177,7 @@ fn test_concurrent_hnsw_no_panic() {
     }
 
     let guard = db.read().unwrap();
-    let results = guard.query_similar(&vec![0.0; DIM], 0.0, 500).unwrap();
+    let results = guard.query_similar(&[0.0; DIM], 0.0, 500).unwrap();
     assert!(!results.is_empty(), "should have some episodes");
     assert!(results.len() <= 4 * n_writes, "cannot exceed total stored");
 }

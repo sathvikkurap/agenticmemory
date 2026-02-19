@@ -322,7 +322,7 @@ impl AgentMemDB {
         Self {
             dim,
             episodes: HashMap::new(),
-            index: IndexBackend::Hnsw(HnswIndex::new(max_elements)),
+            index: IndexBackend::Hnsw(Box::new(HnswIndex::new(max_elements))),
             key_to_uuid: HashMap::new(),
         }
     }
@@ -437,8 +437,8 @@ impl AgentMemDB {
             if dist_cmp != std::cmp::Ordering::Equal {
                 return dist_cmp;
             }
-            let ts_a = a.1.timestamp.unwrap_or(std::i64::MIN);
-            let ts_b = b.1.timestamp.unwrap_or(std::i64::MIN);
+            let ts_a = a.1.timestamp.unwrap_or(i64::MIN);
+            let ts_b = b.1.timestamp.unwrap_or(i64::MIN);
             ts_b.cmp(&ts_a)
         });
         let episodes: Vec<Episode> = candidates
@@ -524,7 +524,7 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
+            IndexBackend::Hnsw(Box::new(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2))))
         };
         for ep in kept {
             let id = ep.id;
@@ -544,8 +544,8 @@ impl AgentMemDB {
         let mut episodes: Vec<Episode> = self.episodes.drain().map(|(_, ep)| ep).collect();
         let original = episodes.len();
         episodes.sort_by(|a, b| {
-            let ts_a = a.timestamp.unwrap_or(std::i64::MIN);
-            let ts_b = b.timestamp.unwrap_or(std::i64::MIN);
+            let ts_a = a.timestamp.unwrap_or(i64::MIN);
+            let ts_b = b.timestamp.unwrap_or(i64::MIN);
             ts_b.cmp(&ts_a)
         });
         let kept: Vec<Episode> = episodes.into_iter().take(n).collect();
@@ -555,7 +555,7 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
+            IndexBackend::Hnsw(Box::new(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2))))
         };
         for ep in kept {
             let id = ep.id;
@@ -582,8 +582,8 @@ impl AgentMemDB {
             if reward_cmp != std::cmp::Ordering::Equal {
                 return reward_cmp;
             }
-            let ts_a = a.timestamp.unwrap_or(std::i64::MIN);
-            let ts_b = b.timestamp.unwrap_or(std::i64::MIN);
+            let ts_a = a.timestamp.unwrap_or(i64::MIN);
+            let ts_b = b.timestamp.unwrap_or(i64::MIN);
             ts_b.cmp(&ts_a)
         });
         let kept: Vec<Episode> = episodes.into_iter().take(n).collect();
@@ -593,7 +593,7 @@ impl AgentMemDB {
         self.index = if was_exact {
             IndexBackend::Exact(ExactIndex::new())
         } else {
-            IndexBackend::Hnsw(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2)))
+            IndexBackend::Hnsw(Box::new(HnswIndex::new(kept.len().max(20_000).max(self.dim * 2))))
         };
         for ep in kept {
             let id = ep.id;

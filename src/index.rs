@@ -97,7 +97,7 @@ impl HnswIndex {
 
 /// Pluggable index backend. AgentMemDB uses this internally.
 pub enum IndexBackend {
-    Hnsw(HnswIndex),
+    Hnsw(Box<HnswIndex>),
     Exact(ExactIndex),
 }
 
